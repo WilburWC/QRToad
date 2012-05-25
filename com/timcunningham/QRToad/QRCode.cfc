@@ -2,6 +2,7 @@
 					Download the latest version from http://itextpdf.com 
 					put the itext JAR in your ColdFusion class path. 
 					Restart ColdFusion service">
+<cfset cfVersion = VAL(server.ColdFusion.ProductVersion)>
 <cfset QR = createObject("java","com.itextpdf.text.pdf.BarcodeQRCode")>
 <cfset color = createObject("java","java.awt.Color")>
 <cfset goodColorList = 	"BLACK,BLUE,CYAN,DARK_GRAY,GRAY,GREEN,LIGHT_GRAY,MAGENTA,ORANGE,PINK,RED,WHITE,YELLOW,
@@ -89,13 +90,19 @@
 	<cfif checkExtension(arguments.format) IS false>
 		<cfthrow message="Image format must be png,jpg, or gif">
 	</cfif>
+	
 	<cfset var binaryImage 	= "">
 	<cfset var cfNewImage 	= imageNew("",getWidth(arguments.image),getHeight(arguments.image), "argb")> 
 	<cfset var graphics 	= ImageGetBufferedImage(cfNewImage).getgraphics()>
+	
 	<cfset graphics.drawImage(arguments.image, 0, 0, javacast("null", ""))>
-	<cfset var imagePath = "ram://" & createUUID() & "." & arguments.format> 	<!--- <cfset imagepath = expandPath("test.png")> --->
+	<cfif cfVers GTE 9>	
+		<cfset var imagePath = "ram://" & createUUID() & "." & arguments.format> 	<!--- <cfset imagepath = expandPath("test.png")> --->
+	<cfelse>
+		<cfset var imagePath = GetTempDirectory() & createUUID() & "." & arguments.format>
+	</cfif>
 	<cfset imageWrite(cfNewImage, imagePath)>
-	<Cfset graphics.dispose()>
+	<cfset graphics.dispose()>
 	<cffile action="readbinary" file="#imagePath#" variable="binaryImage" >
 	<cffile action="delete" file="#imagePath#"> 
 	<cfreturn  binaryImage>
