@@ -1,6 +1,7 @@
-_derived
+﻿_derived
 _private
 _vti*
+.tmp*
 *.scc
 *.bak
 *_BAK*
